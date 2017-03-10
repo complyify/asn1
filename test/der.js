@@ -1,14 +1,23 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import ASN1 from '../src';
 
-import { DER } from '../src';
+import {
+  pkcs10DER,
+  pkcs10JSON,
+  rsaPrivateKeyDER,
+  rsaPrivateKeyJSON,
+} from './resources';
 
-describe('der', () => {
-  it('should do shit', () => {
-    const file = readFileSync(join(__dirname, 'resources/pkcs10.der'));
-    //const file = readFileSync(join(__dirname, 'resources/rsa_private_key_1024.der'));
-    const asn1 = DER.parse(file);
-    console.log('-------------- RESULT --------------');
+describe('DER', () => {
+  it('should parse a DER-encoded pkcs#10', () => {
+    const asn1 = ASN1.from(pkcs10DER, ASN1.Encodings.DER);
+    //JSON.stringify(asn1).should.equal(JSON.stringify(pkcs10JSON));
     console.log(JSON.stringify(asn1, null, 2));
   });
+  /*
+  it('should parse a DER-encoded RSA private key', () => {
+    const asn1 = ASN1.DER.from(rsaPrivateKeyDER);
+    //throw new Error('unimplemented');
+    console.log(JSON.stringify(asn1, null, 2));
+  });
+  */
 });
