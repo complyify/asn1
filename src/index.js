@@ -1,9 +1,18 @@
+/*
+Overview: ftp://ftp.rsa.com/pub/pkcs/ascii/layman.asc
+Latest ASN.1: file:///Users/jc/Downloads/T-REC-X.680-201508-I!!PDF-E.pdf
+OID Encoding: https://msdn.microsoft.com/en-us/library/bb540809(v=vs.85).aspx
+*/
+
 import Debug from 'debug';
 import { find } from 'lodash';
+import BigInteger from 'node-biginteger';
 
 import * as Encodings from './encodings';
 import * as Errors from './errors';
 import * as Types from './types';
+
+const FLAG_LONG = 0b10000000;
 
 const debug = {
   parse: Debug('complyify:asn1:parse'),
@@ -24,8 +33,87 @@ function decodeType(asn1Obj) {
   return find(Types.Universal, universal => universal.value === asn1Obj.type).name;
 }
 
+function decodeOID(buffer) {
+  debug.parse('decoding oid');
+  let b = buffer[0];
+  let oid = `${Math.floor(b / 40)}.${b % 40}`; // stupid first byte = first 2 OID node encoding bullshit
+  // other bytes are each value in base 128 with 8th bit set except for the last byte for each value
+  let value = 0;
+  let i = 1;
+  while (i < buffer.length) {
+    b = buffer[i];
+    value <<= 7;
+    if (b & FLAG_LONG) {        // not the last byte for the value
+      value += b & ~FLAG_LONG;
+    } else {                    // last byte
+      oid += `.${value + b}`;
+      value = 0;
+    }
+    i += 1;
+  }
+  debug.parse(`decoded OID ${oid}`);
+  return oid;
+}
+
+function decodeInteger(buffer) {
+  debug.parse('decoding integer');
+  let integer = null;
+  if (buffer.length <= 6) {
+    integer = buffer.readUIntBE(0, buffer.length);
+    debug.parse('decoded integer %d', integer);
+  } else {
+    integer = BigInteger.fromBuffer(1, buffer);
+    debug.parse('decoded integer %s', integer);
+  }
+  return integer;
+}
+
+function decodeAsciiString(buffer) {
+  debug.parse('decoding ascii string');
+  const str = buffer.toString('ascii');
+  debug.parse('decoded string "%s"', str);
+  return str;
+}
+
 function decodeContent(asn1Obj) {
-  return 'decoded!';
+  switch (asn1Obj.type) {
+    case Types.Universal.EOC.name:
+    case Types.Universal.NULL.name:
+    case Types.Universal.SEQUENCE.name:
+    case Types.Universal.SET.name:
+    case Types.Universal.BIT_STRING.name:
+      debug.parse('no content to decode');
+      return asn1Obj.content;
+    case Types.Universal.NumericString.name:
+    case Types.Universal.PrintableString.name:
+    case Types.Universal.IA5String.name:
+    case Types.Universal.Object_Descriptor.name:
+      return decodeAsciiString(asn1Obj.content);
+    case Types.Universal.OBJECT_IDENTIFIER.name:
+    case Types.Universal.RELATIVE_OID.name:
+      return decodeOID(asn1Obj.content);
+    case Types.Universal.BOOLEAN.name: {
+      debug.parse('decoding boolean');
+      throw new Error('boolean decoding unimplemented');
+    }
+    case Types.Universal.INTEGER.name: {
+      return decodeInteger(asn1Obj.content);
+    }
+    case Types.Universal.OCTET_STRING.name: {
+      debug.parse('decoding octet string');
+      throw new Error('octet string decoding unimplemented');
+    }
+    case Types.Universal.REAL.name: {
+      debug.parse('decoding float');
+      throw new Error('float decoding unimplemented');
+    }
+    case Types.Universal.UTF8String.name: {
+      debug.parse('decoding utf8 string');
+      return asn1Obj.content.toString('utf8');
+    }
+    default:
+      throw new Error(`unsupported content decoding for ${asn1Obj.type}`);
+  }
 }
 
 function decodeASN1Object(asn1Obj) {

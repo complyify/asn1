@@ -9,7 +9,7 @@ import {
 
 describe('DER', () => {
   it('should parse a DER-encoded pkcs#10', () => {
-    const asn1 = ASN1.from(pkcs10DER, ASN1.Encodings.DER);
+    const asn1 = ASN1.from(rsaPrivateKeyDER, ASN1.Encodings.DER);
     //JSON.stringify(asn1).should.equal(JSON.stringify(pkcs10JSON));
     console.log(JSON.stringify(asn1, null, 2));
   });
