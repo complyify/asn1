@@ -14,6 +14,57 @@ const rawASN1Buffer = fs.readFileSync('some_file.der');
 const asn1 = ASN1.from(rawASN1Buffer, ASN1.Encodings.DER);
 ```
 
+## Debugging
+
+This library uses the [@complyify/debug] library for debugging. To enable debug messages, simply set the `DEBUG`
+environment variable.
+
+```shell
+# enable all debugging messages in this library
+DEBUG=complyify:asn1:* <your-exec-here>
+# enable all debug messages except the bit twiddling messages
+DEBUG=complyify:asn1:*,-complyify:asn1:*:binary <your-exec-here>
+```
+
+## Encoding Support
+
+- [ ] BER Serializer
+- [ ] BER Deserializer
+- [ ] DER Serializer
+- [x] DER Deserializer
+
+## Universal Type Support
+
+Unimplemented types return content as a [Buffer] containing the raw value octets from the ASN.1 content.
+
+- [ ] Boolean
+- [x] Integer
+- [ ] Bit String
+- [ ] Octet String
+- [x] Null
+- [x] Object Identifier (OID)
+- [x] Object Descriptor
+- [ ] External
+- [ ] Real (Float)
+- [ ] Enumerated
+- [ ] Embedded PDV
+- [x] UTF8 String
+- [x] Relative Object Identifier (ROID)
+- [x] Sequence
+- [x] Set
+- [x] Numeric String
+- [x] Printable String
+- [ ] T61 String
+- [ ] Videotex String
+- [ ] IA5 String
+- [ ] UTC Time
+- [ ] Generalized Time
+- [ ] Graphic String
+- [ ] Visible String
+- [ ] Universal String
+- [ ] Character String
+- [ ] BMP String
+
 ## Example Object
 
 The object created for a PKCS#10 (certificate signing request) looks like:
@@ -295,43 +346,5 @@ The object created for a PKCS#10 (certificate signing request) looks like:
 ]
 ```
 
-## Encoding Support
-
-- [ ] BER Serializer
-- [ ] BER Deserializer
-- [ ] DER Serializer
-- [x] DER Deserializer
-
-## Universal Type Support
-
-Unimplemented types return content as a [Buffer] containing the raw value octets from the ASN.1 content.
-
-- [ ] Boolean
-- [x] Integer
-- [ ] Bit String
-- [ ] Octet String
-- [x] Null
-- [x] Object Identifier (OID)
-- [x] Object Descriptor
-- [ ] External
-- [ ] Real (Float)
-- [ ] Enumerated
-- [ ] Embedded PDV
-- [x] UTF8 String
-- [x] Relative Object Identifier (ROID)
-- [x] Sequence
-- [x] Set
-- [x] Numeric String
-- [x] Printable String
-- [ ] T61 String
-- [ ] Videotex String
-- [ ] IA5 String
-- [ ] UTC Time
-- [ ] Generalized Time
-- [ ] Graphic String
-- [ ] Visible String
-- [ ] Universal String
-- [ ] Character String
-- [ ] BMP String
-
 [Buffer]: https://nodejs.org/api/buffer.html
+[@complyify/debug]: https://github.com/complyify/debug
