@@ -29,7 +29,8 @@
   },
   "dependencies": {
     "binary": "^0.3.0",
-    "bitwise": "^0.2.0",
-    "debug": "^2.6.1"
+    "lodash": "^4.17.4",
+    "node-biginteger": "^0.0.10",
+    "verror": "^1.9.0"
   }
 }

@@ -1,4 +1,11 @@
-export class ASN1Error extends Error { }
+import VError from 'verror';
+
+export class ASN1Error extends VError { }
+export class ASN1ParseError extends ASN1Error { }
+export class InvalidASN1DataError extends ASN1Error { }
+export class UnsupportedASN1DataError extends ASN1Error { }
+export class DERError extends ASN1Error { }
+
 export class IllegalContent extends ASN1Error { }
 export class IllegalEncoding extends IllegalContent { }
 export class UnknownTagClass extends ASN1Error { }
