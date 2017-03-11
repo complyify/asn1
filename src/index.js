@@ -4,7 +4,7 @@ Latest ASN.1: file:///Users/jc/Downloads/T-REC-X.680-201508-I!!PDF-E.pdf
 OID Encoding: https://msdn.microsoft.com/en-us/library/bb540809(v=vs.85).aspx
 */
 
-import Debug from 'debug';
+import Debug from '@complyify/debug';
 import { find } from 'lodash';
 import BigInteger from 'node-biginteger';
 
@@ -75,13 +75,17 @@ function decodeAsciiString(buffer) {
   return str;
 }
 
+function decodeUTF8String(buffer) {
+  debug.parse('decoding utf8 string');
+  return buffer.toString('utf8');
+}
+
 function decodeContent(asn1Obj) {
   switch (asn1Obj.type) {
     case Types.Universal.EOC.name:
     case Types.Universal.NULL.name:
     case Types.Universal.SEQUENCE.name:
     case Types.Universal.SET.name:
-    case Types.Universal.BIT_STRING.name:
       debug.parse('no content to decode');
       return asn1Obj.content;
     case Types.Universal.NumericString.name:
@@ -92,27 +96,13 @@ function decodeContent(asn1Obj) {
     case Types.Universal.OBJECT_IDENTIFIER.name:
     case Types.Universal.RELATIVE_OID.name:
       return decodeOID(asn1Obj.content);
-    case Types.Universal.BOOLEAN.name: {
-      debug.parse('decoding boolean');
-      throw new Error('boolean decoding unimplemented');
-    }
-    case Types.Universal.INTEGER.name: {
+    case Types.Universal.INTEGER.name:
       return decodeInteger(asn1Obj.content);
-    }
-    case Types.Universal.OCTET_STRING.name: {
-      debug.parse('decoding octet string');
-      throw new Error('octet string decoding unimplemented');
-    }
-    case Types.Universal.REAL.name: {
-      debug.parse('decoding float');
-      throw new Error('float decoding unimplemented');
-    }
-    case Types.Universal.UTF8String.name: {
-      debug.parse('decoding utf8 string');
-      return asn1Obj.content.toString('utf8');
-    }
+    case Types.Universal.UTF8String.name:
+      return decodeUTF8String(asn1Obj.content);
     default:
-      throw new Error(`unsupported content decoding for ${asn1Obj.type}`);
+      debug.parse(`${asn1Obj.type} decoding unimplemented, returning raw content`);
+      return asn1Obj.content;
   }
 }
 
