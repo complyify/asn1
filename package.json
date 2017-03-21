@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "@complyify/debug": "^1.0.1",
-    "binary": "^0.3.0",
     "lodash": "^4.17.4",
     "node-biginteger": "^0.0.10",
     "verror": "^1.9.0"

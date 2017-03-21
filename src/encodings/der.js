@@ -3,6 +3,7 @@ DER Encoding: https://en.wikipedia.org/wiki/X.690#DER_encoding
 */
 
 import Debug from '@complyify/debug';
+import { pickBy } from 'lodash';
 
 import * as Errors from '../errors';
 import * as Types from '../types';
@@ -18,6 +19,7 @@ const FLAG_LONG = 0b10000000;
 const debug = {
   parse: Debug('complyify:asn1:der:parse'),
   binary: Debug('complyify:asn1:der:parse:binary'),
+  serialize: Debug('complyify:asn1:der:serialze'),
 };
 
 /** Parse TLV triplet for long form content byte boundaries */
@@ -107,6 +109,24 @@ function tlv(buffer, firstByte) {
   return { tagClass, encoding, type, content, lastByte };
 }
 
+function createTypeData(tagClassName, encoding, type) {
+  let typeByte = 0;
+  const tagClassSearchResult = pickBy(Types.TagClass, tagClass => tagClass.name === tagClassName);
+  const tagClassSearchResultKeys = Object.keys(tagClassSearchResult);
+  if (tagClassSearchResultKeys.length < 1) throw new Errors.UnknownTagClass(`unknown tag class "${tagClassName}"`);
+  const tagClass = tagClassSearchResult[Object.keys(tagClassSearchResult)[0]];
+  typeByte |= tagClass.value;
+  return typeByte;
+}
+
+function createLengthData(tagClass, encoding, type, value) {
+
+}
+
+function createValueData(tagClass, encoding, type, value) {
+
+}
+
 export const DER = {
 
   name: 'DER',
@@ -127,6 +147,21 @@ export const DER = {
     } while (byte < buffer.length);
     debug.parse('done parsing DER, found %d entries', values.length);
     return values;
+  },
+
+  toBuffer(asn1Obj) {
+    debug.serialize('serializing object to DER');
+    const bytes = [];
+    if (Array.isArray(asn1Obj)) asn1Obj.forEach(asn1SubObj => bytes.push(DER.toBuffer(asn1SubObj)));
+    else {
+      const { tagClass, encoding, type, value, children } = asn1Obj;
+      const typeData = createTypeData(tagClass, encoding, type);
+      const lengthData = createLengthData(tagClass, encoding, type, value);
+      const valueData = createValueData(tagClass, encoding, type, value);
+      bytes.push(typeData, lengthData, valueData);
+      if (children && children.length > 1) children.forEach(child => bytes.push(DER.toBuffer(child)));
+    }
+    return Buffer.from(bytes);
   },
 
 };
