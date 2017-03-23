@@ -1,7 +1,8 @@
 import VError from 'verror';
 
 export class ASN1Error extends VError { }
-export class ASN1ParseError extends ASN1Error { }
+export class ASN1DeserializationError extends ASN1Error { }
+export class ASN1SerializationError extends ASN1Error { }
 export class InvalidASN1DataError extends ASN1Error { }
 export class UnsupportedASN1DataError extends ASN1Error { }
 export class DERError extends ASN1Error { }
