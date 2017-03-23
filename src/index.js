@@ -34,7 +34,7 @@ function decodeType(asn1Obj) {
   return find(Types.TagClass.Universal.types, universal => universal.value === asn1Obj.type).name;
 }
 
-// TODO revisit this function, hard to follow
+// TODO revisit this function, hard to follow, from node-forge
 function decodeOID(buffer) {
   debug.deserialize('decoding oid');
   let b = buffer[0];

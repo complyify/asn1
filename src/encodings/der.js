@@ -110,6 +110,7 @@ function tlv(buffer, firstByte) {
   return { tagClass, encoding, type, content, lastByte };
 }
 
+// TODO revisit this function, hard to follow, from node-forge
 function encodeLength(contentLength) {
   if (contentLength < 128) return [contentLength];
   const result = [];
@@ -157,7 +158,7 @@ function encodeString(asn1Obj) {
   throw new Errors.DERError(`cannot encode ASCII string from ${typeof content}`);
 }
 
-// TODO revisit this function, hard to follow
+// TODO revisit this function, hard to follow, from node-forge
 function encodeOID(asn1Obj) {
   debug.serialize('encoding OID');
   const bytes = [];
