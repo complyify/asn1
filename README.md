@@ -30,7 +30,7 @@ DEBUG=complyify:asn1:*,-complyify:asn1:*:binary <your-exec-here>
 
 - [ ] BER Serializer
 - [ ] BER Deserializer
-- [ ] DER Serializer
+- [x] DER Serializer
 - [x] DER Deserializer
 
 ## Universal Type Support
