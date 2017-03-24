@@ -1,4 +1,5 @@
 import ASN1 from '../src';
+import fs from 'fs';
 
 import {
   pkcs10DER,
@@ -26,6 +27,7 @@ describe('DER', () => {
     it('should serialize a PKCS#10 object', () => {
       try {
         const der = ASN1.serialize(pkcs10Obj, ASN1.Encodings.DER);
+        fs.writeFileSync('/tmp/wtf.der', der);
       } catch (err) {
         console.error(err);
         throw err;

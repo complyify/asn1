@@ -130,14 +130,20 @@ function encodeLength(contentLength) {
 }
 
 function encode(asn1Obj, tagClass, type, contentEncoder) {
-  debug.serialize('encoding %s %s', tagClass.name, type.name);
+  debug.serialize('encoding %s %s: %s', tagClass.name, type.name, asn1Obj.content);
   const { Primitive, Constructed } = Types.Encoding;
-  if ((type.encoding.primitive && asn1Obj.encoding !== Primitive.name)
-  && (type.encoding.constructed && asn1Obj.encoding !== Constructed.name)) {
+  if (typeof type !== 'number' && (type.encoding.primitive && asn1Obj.encoding !== Primitive.name)
+                               && (type.encoding.constructed && asn1Obj.encoding !== Constructed.name)) {
     throw new Errors.DERError(`illegal encoding: "${asn1Obj.encoding}"`);
   }
   const encoding = asn1Obj.encoding === Primitive.name ? Primitive : Constructed;
-  const bytes = [tagClass.value | encoding.value | type.value];
+  const bytes = [];
+  const tagClassValue = tagClass.value;
+  const encodingValue = encoding.value;
+  const typeValue = typeof type === 'number' ? type : type.value;
+  debug.serializeBinary('tag class: %d, encoding: %d, type: %d', tagClassValue, encodingValue, typeValue);
+  bytes.push(tagClassValue + encodingValue + typeValue);
+  debug.serializeBinary('type byte %b', bytes);
   const content = contentEncoder(asn1Obj);
   const lengthBytes = encodeLength(content.length);
   bytes.push(...lengthBytes, ...content);
@@ -188,9 +194,19 @@ function encodeOID(asn1Obj) {
   return bytes;
 }
 
+function encodeBuffer(asn1Obj) {
+  const { content } = asn1Obj;
+  if (content == null) return [];
+  if (Buffer.isBuffer(content)) return Array.prototype.slice.call(content, 0);
+  return Array.prototype.slice.call(Buffer.from(content), 0);
+}
+
 function encodeUnsupported(asn1Obj) {
-  debug.serialize('encoding unsupported type %s %s', asn1Obj.tagClass, asn1Obj.type);
-  return [];
+  const { tagClass: tagClassName, type: typeName } = asn1Obj;
+  debug.serialize('encoding unsupported type %s %s', tagClassName, typeName);
+  const tagClass = Types.findTagClassByName(tagClassName);
+  const type = typeof typeName === 'number' ? typeName : Types.findTypeByName(tagClass, typeName);
+  return encode(asn1Obj, tagClass, type, encodeBuffer);
 }
 
 function encodeApplication(asn1Obj) {
@@ -264,7 +280,13 @@ export const DER = {
 function encodeChildren(asn1Obj) {
   debug.serialize('encoding children');
   const bytes = [];
-  asn1Obj.children.forEach(child => bytes.push(...DER.toByteArray(child)));
+  asn1Obj.children.forEach((child) => {
+    debug.serialize('encoding child:', child);
+    const encodedChild = DER.toByteArray(child);
+    debug.serializeBinary('encoded child: %h', Buffer.from(encodedChild));
+    bytes.push(...encodedChild);
+  });
+  debug.serializeBinary('encoded children: %h', Buffer.from(bytes));
   return bytes;
 }
 
