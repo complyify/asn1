@@ -16,6 +16,6 @@ function load(fileName, type) {
 }
 
 export const pkcs10DER = load('pkcs10.der', TYPE_BINARY);
-export const pkcs10JSON = load('pkcs10.json', TYPE_JSON);
 export const rsaPrivateKeyDER = load('rsa_private_key_1024.der', TYPE_BINARY);
-export const rsaPrivateKeyJSON = load('rsa_private_key_1024.json', TYPE_JSON);
+
+export { default as pkcs10Obj } from './pkcs10';
