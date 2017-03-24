@@ -141,20 +141,47 @@ function encode(asn1Obj, tagClass, type, contentEncoder) {
   const tagClassValue = tagClass.value;
   const encodingValue = encoding.value;
   const typeValue = typeof type === 'number' ? type : type.value;
-  debug.serializeBinary('tag class: %d, encoding: %d, type: %d', tagClassValue, encodingValue, typeValue);
+  debug.serialize('tag class: %d, encoding: %d, type: %d', tagClassValue, encodingValue, typeValue);
   bytes.push(tagClassValue + encodingValue + typeValue);
-  debug.serializeBinary('type byte %b', bytes);
   const content = contentEncoder(asn1Obj);
   const lengthBytes = encodeLength(content.length);
   bytes.push(...lengthBytes, ...content);
   return bytes;
 }
 
+function encodeBigInteger(asn1Obj) {
+  const { content } = asn1Obj;
+  debug.serialize('encoding big integer: %s', content.toString());
+  const contentBuffer = content.toBuffer();
+  debug.serializeBinary('big integer encoded: %h', contentBuffer);
+  const contentByteArray = Array.prototype.slice.call(contentBuffer, 0);
+  return contentByteArray;
+}
+
+function encodeShortInteger(asn1Obj) {
+  const { content } = asn1Obj;
+  debug.serialize('encoding short integer: %d', content);
+  let bytes = 1; // default to at least 1 byte to encode 0 value integer
+  if (content > 0) { // because log2(n) / 8 + 1 is going to occassionally have rounding errors thx to float log2 oper
+    bytes = 0;
+    let num = content;
+    while (num > 0) {
+      num >>= 8;
+      bytes += 1;
+    }
+  }
+  debug.serializeBinary('will use %d bytes to encode integer %d', bytes, content);
+  const buffer = new Buffer(bytes);
+  buffer.writeUIntBE(content, 0, bytes);
+  const contentByteArray = Array.prototype.slice.call(buffer, 0);
+  return contentByteArray;
+}
+
 function encodeInteger(asn1Obj) {
   const { content } = asn1Obj;
   if (content == null) throw new Errors.DERError('integer content must not be null');
-  if (typeof content === 'number') return [content];
-  if (content instanceof BigInteger) return Array.prototype.slice.call(content.toBuffer(), 0);
+  if (typeof content === 'number') return encodeShortInteger(asn1Obj);
+  if (content instanceof BigInteger) return encodeBigInteger(asn1Obj);
   throw new Errors.DERError(`cannot encode integer from ${typeof content}`);
 }
 
@@ -209,6 +236,19 @@ function encodeUnsupported(asn1Obj) {
   return encode(asn1Obj, tagClass, type, encodeBuffer);
 }
 
+function encodeChildren(asn1Obj) {
+  debug.serialize('encoding children');
+  const bytes = [];
+  asn1Obj.children.forEach((child) => {
+    debug.serialize('encoding child:', child);
+    const encodedChild = DER.toByteArray(child); // eslint-disable-line no-use-before-define
+    debug.serializeBinary('encoded child: %h', Buffer.from(encodedChild));
+    bytes.push(...encodedChild);
+  });
+  debug.serializeBinary('encoded children: %h', Buffer.from(bytes));
+  return bytes;
+}
+
 function encodeApplication(asn1Obj) {
   return encodeUnsupported(asn1Obj, Types.TagClass.Application);
 }
@@ -221,7 +261,36 @@ function encodePrivate(asn1Obj) {
   return encodeUnsupported(asn1Obj, Types.TagClass.Private);
 }
 
-export const DER = {
+function encodeUniversal(asn1Obj) {
+  const { Universal } = Types.TagClass;
+  switch (asn1Obj.type) {
+    case Universal.types.SEQUENCE.name:
+      return encode(asn1Obj, Universal, Universal.types.SEQUENCE, encodeChildren);
+    case Universal.types.SET.name:
+      return encode(asn1Obj, Universal, Universal.types.SET, encodeChildren);
+    case Universal.types.INTEGER.name:
+      return encode(asn1Obj, Universal, Universal.types.INTEGER, encodeInteger);
+    case Universal.types.NULL.name:
+      return encode(asn1Obj, Universal, Universal.types.NULL, () => []);
+    case Universal.types.OBJECT_IDENTIFIER.name:
+      return encode(asn1Obj, Universal, Universal.types.OBJECT_IDENTIFIER, encodeOID);
+    case Universal.types.RELATIVE_OID.name:
+      return encode(asn1Obj, Universal, Universal.types.RELATIVE_OID, encodeOID);
+    case Universal.types.NumericString.name:
+      return encode(asn1Obj, Universal, Universal.types.NumericString, encodeString);
+    case Universal.types.PrintableString.name:
+      return encode(asn1Obj, Universal, Universal.types.PrintableString, encodeString);
+    case Universal.types.IA5String.name:
+      return encode(asn1Obj, Universal, Universal.types.IA5String, encodeString);
+    case Universal.types.Object_Descriptor.name:
+      return encode(asn1Obj, Universal, Universal.types.Object_Descriptor, encodeString);
+    case Universal.types.UTF8String.name:
+      return encode(asn1Obj, Universal, Universal.types.UTF8String, encodeString);
+    default: return encodeUnsupported(asn1Obj);
+  }
+}
+
+const DER = {
 
   name: 'DER',
 
@@ -277,44 +346,4 @@ export const DER = {
 
 };
 
-function encodeChildren(asn1Obj) {
-  debug.serialize('encoding children');
-  const bytes = [];
-  asn1Obj.children.forEach((child) => {
-    debug.serialize('encoding child:', child);
-    const encodedChild = DER.toByteArray(child);
-    debug.serializeBinary('encoded child: %h', Buffer.from(encodedChild));
-    bytes.push(...encodedChild);
-  });
-  debug.serializeBinary('encoded children: %h', Buffer.from(bytes));
-  return bytes;
-}
-
-function encodeUniversal(asn1Obj) {
-  const { Universal } = Types.TagClass;
-  switch (asn1Obj.type) {
-    case Universal.types.SEQUENCE.name:
-      return encode(asn1Obj, Universal, Universal.types.SEQUENCE, encodeChildren);
-    case Universal.types.SET.name:
-      return encode(asn1Obj, Universal, Universal.types.SET, encodeChildren);
-    case Universal.types.INTEGER.name:
-      return encode(asn1Obj, Universal, Universal.types.INTEGER, encodeInteger);
-    case Universal.types.NULL.name:
-      return encode(asn1Obj, Universal, Universal.types.NULL, () => []);
-    case Universal.types.OBJECT_IDENTIFIER.name:
-      return encode(asn1Obj, Universal, Universal.types.OBJECT_IDENTIFIER, encodeOID);
-    case Universal.types.RELATIVE_OID.name:
-      return encode(asn1Obj, Universal, Universal.types.RELATIVE_OID, encodeOID);
-    case Universal.types.NumericString.name:
-      return encode(asn1Obj, Universal, Universal.types.NumericString, encodeString);
-    case Universal.types.PrintableString.name:
-      return encode(asn1Obj, Universal, Universal.types.PrintableString, encodeString);
-    case Universal.types.IA5String.name:
-      return encode(asn1Obj, Universal, Universal.types.IA5String, encodeString);
-    case Universal.types.Object_Descriptor.name:
-      return encode(asn1Obj, Universal, Universal.types.Object_Descriptor, encodeString);
-    case Universal.types.UTF8String.name:
-      return encode(asn1Obj, Universal, Universal.types.UTF8String, encodeString);
-    default: return encodeUnsupported(asn1Obj);
-  }
-}
+export default DER;

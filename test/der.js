@@ -27,7 +27,15 @@ describe('DER', () => {
     it('should serialize a PKCS#10 object', () => {
       try {
         const der = ASN1.serialize(pkcs10Obj, ASN1.Encodings.DER);
-        fs.writeFileSync('/tmp/wtf.der', der);
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
+    });
+    it('should serialize a RSA private key object', () => {
+      try {
+        const der = ASN1.serialize(rsaPrivateKeyObj, ASN1.Encodings.DER);
+        fs.writeFileSync('/tmp/key.der', der);
       } catch (err) {
         console.error(err);
         throw err;
