@@ -62,7 +62,7 @@ Unimplemented types return content as a [Buffer] containing the raw value octets
 - [x] Printable String
 - [ ] T61 String
 - [ ] Videotex String
-- [ ] IA5 String
+- [x] IA5 String
 - [ ] UTC Time
 - [ ] Generalized Time
 - [ ] Graphic String
