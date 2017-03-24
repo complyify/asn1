@@ -10,8 +10,14 @@ Javascript object serializer and deserializer for Abstract Syntax Notation One (
 
 ```javascript
 import ASN1 from '@complyify/asn1';
-const rawASN1Buffer = fs.readFileSync('some_file.der');
-const asn1 = ASN1.from(rawASN1Buffer, ASN1.Encodings.DER);
+
+const asn1FileContents = fs.readFileSync('some_file.der');
+
+// deserialize an ASN1 object
+const asn1 = ASN1.deserialize(asn1FileContents, ASN1.Encodings.DER);
+
+// serialize an ASN1 object
+const asn1Serialized = ASN1.serialize(asn1, ASN1.Encodings.DER);
 ```
 
 ## Debugging
@@ -30,7 +36,7 @@ DEBUG=complyify:asn1:*,-complyify:asn1:*:binary <your-exec-here>
 
 - [ ] BER Serializer
 - [ ] BER Deserializer
-- [ ] DER Serializer
+- [x] DER Serializer
 - [x] DER Deserializer
 
 ## Universal Type Support
@@ -56,7 +62,7 @@ Unimplemented types return content as a [Buffer] containing the raw value octets
 - [x] Printable String
 - [ ] T61 String
 - [ ] Videotex String
-- [ ] IA5 String
+- [x] IA5 String
 - [ ] UTC Time
 - [ ] Generalized Time
 - [ ] Graphic String

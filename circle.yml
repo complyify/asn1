@@ -1,3 +1,7 @@
+machine:
+  node:
+    version: 6.10.1
+
 dependencies:
   override:
     - echo -e "$NPM_USERNAME\n$NPM_PASSWORD\n$NPM_EMAIL" | npm login

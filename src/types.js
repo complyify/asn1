@@ -1,5 +1,9 @@
 /* eslint-disable key-spacing, no-multi-spaces, no-bitwise */
 
+import { pickBy } from 'lodash';
+
+import * as Errors from './errors';
+
 function generateEncoding(name, value) {
   return {
     name,
@@ -23,7 +27,7 @@ function generateTagClassType(name, valueEncodings, tagNumber) {
   };
 }
 
-export const Universal = {
+const Universal = {
   EOC:                        generateTagClassType('endOfContent', Encoding.Primitive, 0), // End-of-Content
   BOOLEAN:                    generateTagClassType('boolean', Encoding.Primitive, 1),
   INTEGER:                    generateTagClassType('integer', Encoding.Primitive, 2),
@@ -57,16 +61,41 @@ export const Universal = {
   BMPString:                  generateTagClassType('bmpString', Encoding.Primitive & Encoding.Constructed, 30),
 };
 
-function generateTagClass(name, value) {
+function generateTagClass(name, value, types) {
   return {
     name,
     value,
+    types,
   };
 }
 
 export const TagClass = {
-  Universal:                  generateTagClass('universal', 0x00),
+  Universal:                  generateTagClass('universal', 0x00, Universal),
   Application:                generateTagClass('application', 0x40),
   ContextSpecific:            generateTagClass('context specific', 0x80),
   Private:                    generateTagClass('private', 0xC0),
 };
+
+export function findTagClassByName(tagClassName) {
+  const tagClassSearchResult = pickBy(TagClass, tagClass => tagClass.name === tagClassName);
+  const tagClassSearchResultKeys = Object.keys(tagClassSearchResult);
+  if (tagClassSearchResultKeys.length < 1) throw new Errors.UnknownTagClass(`unknown tag class "${tagClassName}"`);
+  const tagClass = tagClassSearchResult[Object.keys(tagClassSearchResult)[0]];
+  return tagClass;
+}
+
+export function findEncodingByName(encodingName) {
+  const encodingSearchResult = pickBy(Encoding, encoding => encoding.name === encodingName);
+  const encodingSearchResultKeys = Object.keys(encodingSearchResult);
+  if (encodingSearchResultKeys.length < 1) throw new Errors.UnknownEncoding(`unknown encoding "${encodingName}"`);
+  const encoding = encodingSearchResult[Object.keys(encodingSearchResult)[0]];
+  return encoding;
+}
+
+export function findTypeByName(tagClass, typeName) {
+  const typeSearchResult = pickBy(tagClass.types, type => type.name === typeName);
+  const typeSearchResultKeys = Object.keys(typeSearchResult);
+  if (typeSearchResultKeys.length < 1) throw new Errors.UnknownEncoding(`unknown type "${typeName}"`);
+  const type = typeSearchResult[Object.keys(typeSearchResult)[0]];
+  return type;
+}
