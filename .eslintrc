@@ -5,6 +5,7 @@
     "node": true
   },
   "rules": {
+    "import/prefer-default-export": 0,
     "max-len": [ "error", 120 ],
     "no-underscore-dangle": 0,
     "no-bitwise": 0,

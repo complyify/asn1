@@ -1,17 +1,20 @@
 import VError from 'verror';
 
 export class ASN1Error extends VError { }
-export class ASN1DeserializationError extends ASN1Error { }
-export class ASN1SerializationError extends ASN1Error { }
-export class InvalidASN1DataError extends ASN1Error { }
-export class UnsupportedASN1DataError extends ASN1Error { }
-export class DERError extends ASN1Error { }
 
-export class IllegalContent extends ASN1Error { }
-export class IllegalEncoding extends IllegalContent { }
-export class UnknownTagClass extends ASN1Error { }
-export class UnknownEncoding extends ASN1Error { }
-export class UnknownUniversalType extends ASN1Error { }
-export class UnsupportedContentLength extends ASN1Error { }
-export class UnsupportedUniversalType extends ASN1Error { }
-export class UnsupportedTagClass extends ASN1Error { }
+export class ContentError extends ASN1Error { }
+export class InvalidContentError extends ContentError { }
+
+export class EncodingError extends ASN1Error { }
+export class UnsupportedEncodingError extends EncodingError { }
+
+export class ExtensionError extends ASN1Error { }
+export class InvalidExtensionError extends ExtensionError { }
+
+export class DeserializationError extends ASN1Error { }
+export class DERDeserializationError extends DeserializationError { }
+export class PEMDeserializationError extends DeserializationError { }
+
+export class SerializationError extends ASN1Error { }
+export class DERSerializationError extends SerializationError { }
+export class PEMSerializationError extends SerializationError { }
