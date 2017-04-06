@@ -46,6 +46,3 @@ DEBUG=complyify:asn1:*,-complyify:asn1:*:binary <your-exec-here>
 ```
 
 [@complyify/debug]: https://github.com/complyify/debug
-[Overview]: ftp://ftp.rsa.com/pub/pkcs/ascii/layman.asc
-[Latest ASN.1]: file:///Users/jc/Downloads/T-REC-X.680-201508-I!!PDF-E.pdf
-[OID Encoding]: https://msdn.microsoft.com/en-us/library/bb540809(v=vs.85).aspx
