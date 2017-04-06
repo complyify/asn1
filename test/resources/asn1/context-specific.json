@@ -1,0 +1,11 @@
+{
+  "tagClass": "contextSpecific",
+  "encoding": "constructed",
+  "type": 0,
+  "content": {
+    "tagClass": "universal",
+    "encoding": "primitive",
+    "type": "integer",
+    "content": 42
+  }
+}

@@ -5,9 +5,11 @@
     "node": true
   },
   "rules": {
+    "import/prefer-default-export": 0,
     "max-len": [ "error", 120 ],
     "no-underscore-dangle": 0,
     "no-bitwise": 0,
-    "no-confusing-arrow": 0
+    "no-confusing-arrow": 0,
+    "class-methods-use-this": 0
   }
 }

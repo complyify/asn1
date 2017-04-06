@@ -1,6 +1,8 @@
 # @complyify/asn1
 
-Javascript object serializer and deserializer for Abstract Syntax Notation One (ASN.1).
+Javascript library for Abstract Syntax Notation One (ASN.1).
+
+Provides a programmatic interface for building an ASN.1 object model along with JSON serialization / deserialization.
 
 ## Installation
 
@@ -9,15 +11,26 @@ Javascript object serializer and deserializer for Abstract Syntax Notation One (
 ## Usage
 
 ```javascript
-import ASN1 from '@complyify/asn1';
+import { JSONDeserializer, JSONSerializer, Universal } from '@complyify/asn1';
 
-const asn1FileContents = fs.readFileSync('some_file.der');
+// Create an ASN.1 object model programmatically
+const { Bool, Integer, Null, PrintableString, Sequence } = Universal;
+const sequence = new Sequence([
+  new Integer(-Number.MAX_SAFE_INTEGER),
+  new Integer(Number.MAX_SAFE_INTEGER),
+  new Integer('424242424242424242424242424242424242'), // big integer
+  new Null(),
+  new Bool(true),
+  new PrintableString('nice marmot'),
+]);
 
-// deserialize an ASN1 object
-const asn1 = ASN1.deserialize(asn1FileContents, ASN1.Encodings.DER);
+// Serialize the object model to JSON
+const serialize = new JSONSerializer();
+const json = serialize(sequence);
 
-// serialize an ASN1 object
-const asn1Serialized = ASN1.serialize(asn1, ASN1.Encodings.DER);
+// Deserialize back to an ASN.1 object model
+const deserialize = new JSONDeserializer();
+const asn1ObjectModel = deserialize(json);
 ```
 
 ## Debugging
@@ -32,325 +45,7 @@ DEBUG=complyify:asn1:* <your-exec-here>
 DEBUG=complyify:asn1:*,-complyify:asn1:*:binary <your-exec-here>
 ```
 
-## Encoding Support
-
-- [ ] BER Serializer
-- [ ] BER Deserializer
-- [x] DER Serializer
-- [x] DER Deserializer
-
-## Universal Type Support
-
-Unimplemented types return content as a [Buffer] containing the raw value octets from the ASN.1 content.
-
-- [ ] Boolean
-- [x] Integer
-- [ ] Bit String
-- [ ] Octet String
-- [x] Null
-- [x] Object Identifier (OID)
-- [x] Object Descriptor
-- [ ] External
-- [ ] Real (Float)
-- [ ] Enumerated
-- [ ] Embedded PDV
-- [x] UTF8 String
-- [x] Relative Object Identifier (ROID)
-- [x] Sequence
-- [x] Set
-- [x] Numeric String
-- [x] Printable String
-- [ ] T61 String
-- [ ] Videotex String
-- [x] IA5 String
-- [ ] UTC Time
-- [ ] Generalized Time
-- [ ] Graphic String
-- [ ] Visible String
-- [ ] Universal String
-- [ ] Character String
-- [ ] BMP String
-
-## Example Object
-
-The object created for a PKCS#10 (certificate signing request) looks like:
-
-```javascript
-[
-  {
-    "tagClass": "universal",
-    "encoding": "constructed",
-    "type": "sequence",
-    "children": [
-      {
-        "tagClass": "universal",
-        "encoding": "constructed",
-        "type": "sequence",
-        "children": [
-          {
-            "tagClass": "universal",
-            "encoding": "primitive",
-            "type": "integer",
-            "content": 0
-          },
-          {
-            "tagClass": "universal",
-            "encoding": "constructed",
-            "type": "sequence",
-            "children": [
-              {
-                "tagClass": "universal",
-                "encoding": "constructed",
-                "type": "set",
-                "children": [
-                  {
-                    "tagClass": "universal",
-                    "encoding": "constructed",
-                    "type": "sequence",
-                    "children": [
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "oid",
-                        "content": "2.5.4.6"
-                      },
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "printableString",
-                        "content": "US"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "tagClass": "universal",
-                "encoding": "constructed",
-                "type": "set",
-                "children": [
-                  {
-                    "tagClass": "universal",
-                    "encoding": "constructed",
-                    "type": "sequence",
-                    "children": [
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "oid",
-                        "content": "2.5.4.8"
-                      },
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "printableString",
-                        "content": "Texas"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "tagClass": "universal",
-                "encoding": "constructed",
-                "type": "set",
-                "children": [
-                  {
-                    "tagClass": "universal",
-                    "encoding": "constructed",
-                    "type": "sequence",
-                    "children": [
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "oid",
-                        "content": "2.5.4.7"
-                      },
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "printableString",
-                        "content": "Dallas"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "tagClass": "universal",
-                "encoding": "constructed",
-                "type": "set",
-                "children": [
-                  {
-                    "tagClass": "universal",
-                    "encoding": "constructed",
-                    "type": "sequence",
-                    "children": [
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "oid",
-                        "content": "2.5.4.10"
-                      },
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "printableString",
-                        "content": "Complyify LLC"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "tagClass": "universal",
-                "encoding": "constructed",
-                "type": "set",
-                "children": [
-                  {
-                    "tagClass": "universal",
-                    "encoding": "constructed",
-                    "type": "sequence",
-                    "children": [
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "oid",
-                        "content": "2.5.4.11"
-                      },
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "printableString",
-                        "content": "Engineering"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "tagClass": "universal",
-                "encoding": "constructed",
-                "type": "set",
-                "children": [
-                  {
-                    "tagClass": "universal",
-                    "encoding": "constructed",
-                    "type": "sequence",
-                    "children": [
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "oid",
-                        "content": "2.5.4.3"
-                      },
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "printableString",
-                        "content": "Test Cert for Testing Only Plz"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "tagClass": "universal",
-                "encoding": "constructed",
-                "type": "set",
-                "children": [
-                  {
-                    "tagClass": "universal",
-                    "encoding": "constructed",
-                    "type": "sequence",
-                    "children": [
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "oid",
-                        "content": "1.2.840.113549.1.9.1"
-                      },
-                      {
-                        "tagClass": "universal",
-                        "encoding": "primitive",
-                        "type": "ia5String",
-                        "content": "comply@whiterabbit.wtf"
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "tagClass": "universal",
-            "encoding": "constructed",
-            "type": "sequence",
-            "children": [
-              {
-                "tagClass": "universal",
-                "encoding": "constructed",
-                "type": "sequence",
-                "children": [
-                  {
-                    "tagClass": "universal",
-                    "encoding": "primitive",
-                    "type": "oid",
-                    "content": "1.2.840.113549.1.1.1"
-                  },
-                  {
-                    "tagClass": "universal",
-                    "encoding": "primitive",
-                    "type": "null",
-                    "content": null
-                  }
-                ]
-              },
-              {
-                "tagClass": "universal",
-                "encoding": "primitive",
-                "type": "bitString",
-                "content": <Buffer 0d c3 ...>
-              }
-            ]
-          },
-          {
-            "tagClass": "context specific",
-            "encoding": "constructed",
-            "type": 0,
-            "content": null
-          }
-        ]
-      },
-      {
-        "tagClass": "universal",
-        "encoding": "constructed",
-        "type": "sequence",
-        "children": [
-          {
-            "tagClass": "universal",
-            "encoding": "primitive",
-            "type": "oid",
-            "content": "1.2.840.113549.1.1.5"
-          },
-          {
-            "tagClass": "universal",
-            "encoding": "primitive",
-            "type": "null",
-            "content": null
-          }
-        ]
-      },
-      {
-        "tagClass": "universal",
-        "encoding": "primitive",
-        "type": "bitString",
-        "content": <Buffer 0d c3 ...>
-      }
-    ]
-  }
-]
-```
-
-[Buffer]: https://nodejs.org/api/buffer.html
 [@complyify/debug]: https://github.com/complyify/debug
+[Overview]: ftp://ftp.rsa.com/pub/pkcs/ascii/layman.asc
+[Latest ASN.1]: file:///Users/jc/Downloads/T-REC-X.680-201508-I!!PDF-E.pdf
+[OID Encoding]: https://msdn.microsoft.com/en-us/library/bb540809(v=vs.85).aspx

@@ -1,0 +1,168 @@
+{
+  "tagClass": "universal",
+  "encoding": "constructed",
+  "type": "set",
+  "content": [
+    {
+      "tagClass": "universal",
+      "encoding": "constructed",
+      "type": "set",
+      "content": [
+        {
+          "tagClass": "universal",
+          "encoding": "constructed",
+          "type": "set",
+          "content": [
+            {
+              "tagClass": "universal",
+              "encoding": "constructed",
+              "type": "set",
+              "content": [
+                {
+                  "tagClass": "universal",
+                  "encoding": "constructed",
+                  "type": "set",
+                  "content": [
+                    {
+                      "tagClass": "universal",
+                      "encoding": "constructed",
+                      "type": "set",
+                      "content": [
+                        {
+                          "tagClass": "universal",
+                          "encoding": "constructed",
+                          "type": "set",
+                          "content": [
+                            {
+                              "tagClass": "universal",
+                              "encoding": "constructed",
+                              "type": "set",
+                              "content": [
+                                {
+                                  "tagClass": "universal",
+                                  "encoding": "constructed",
+                                  "type": "set",
+                                  "content": [
+                                    {
+                                      "tagClass": "universal",
+                                      "encoding": "constructed",
+                                      "type": "set",
+                                      "content": [
+                                        {
+                                          "tagClass": "universal",
+                                          "encoding": "constructed",
+                                          "type": "set",
+                                          "content": [
+                                            {
+                                              "tagClass": "universal",
+                                              "encoding": "constructed",
+                                              "type": "set",
+                                              "content": [
+                                                {
+                                                  "tagClass": "universal",
+                                                  "encoding": "constructed",
+                                                  "type": "set",
+                                                  "content": [
+                                                    {
+                                                      "tagClass": "universal",
+                                                      "encoding": "constructed",
+                                                      "type": "set",
+                                                      "content": [
+                                                        {
+                                                          "tagClass": "universal",
+                                                          "encoding": "constructed",
+                                                          "type": "set",
+                                                          "content": [
+                                                            {
+                                                              "tagClass": "universal",
+                                                              "encoding": "constructed",
+                                                              "type": "set",
+                                                              "content": [
+                                                                {
+                                                                  "tagClass": "universal",
+                                                                  "encoding": "constructed",
+                                                                  "type": "set",
+                                                                  "content": [
+                                                                    {
+                                                                      "tagClass": "universal",
+                                                                      "encoding": "constructed",
+                                                                      "type": "set",
+                                                                      "content": [
+                                                                        {
+                                                                          "tagClass": "universal",
+                                                                          "encoding": "constructed",
+                                                                          "type": "set",
+                                                                          "content": [
+                                                                            {
+                                                                              "tagClass": "universal",
+                                                                              "encoding": "constructed",
+                                                                              "type": "set",
+                                                                              "content": [
+                                                                                {
+                                                                                  "tagClass": "universal",
+                                                                                  "encoding": "constructed",
+                                                                                  "type": "set",
+                                                                                  "content": [
+                                                                                    {
+                                                                                      "tagClass": "universal",
+                                                                                      "encoding": "constructed",
+                                                                                      "type": "set",
+                                                                                      "content": [
+                                                                                        {
+                                                                                          "tagClass": "universal",
+                                                                                          "encoding": "constructed",
+                                                                                          "type": "set",
+                                                                                          "content": [
+                                                                                            {
+                                                                                              "tagClass": "universal",
+                                                                                              "encoding": "constructed",
+                                                                                              "type": "set",
+                                                                                              "content": [
+                                                                                              ]
+                                                                                            }
+                                                                                          ]
+                                                                                        }
+                                                                                      ]
+                                                                                    }
+                                                                                  ]
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

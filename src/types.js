@@ -1,101 +1,83 @@
-/* eslint-disable key-spacing, no-multi-spaces, no-bitwise */
+/* eslint-disable max-len */
+import BigInteger from 'node-biginteger';
 
-import { pickBy } from 'lodash';
+import { Constructed, InvalidASN1ContentError, Primitive } from './encodings';
 
-import * as Errors from './errors';
+export class Type { }
 
-function generateEncoding(name, value) {
-  return {
-    name,
-    value,
-  };
-}
-
-export const Encoding = {
-  Primitive:                  generateEncoding('primitive', 0x00),
-  Constructed:                generateEncoding('constructed', 0x20),
+const TypeClassFactory = (tagClass, type, validEncodings, defaultValue, defaultContent, contentProcessor) => class extends Type {
+  constructor(content, { encoding = validEncodings[0], value } = {}) {
+    super();
+    this.encoding = encoding;
+    if (value != null) this._value = value;
+    if (content != null || defaultContent != null) this.content = content != null ? content : defaultContent;
+    if (contentProcessor && this.content != null) this.content = contentProcessor(this.content);
+  }
+  get tagClass() { return tagClass; }
+  get type() { return type || this._value; }
+  get value() { return this._value || defaultValue; }
 };
 
-function generateTagClassType(name, valueEncodings, tagNumber) {
-  return {
-    name,
-    encoding: {
-      primitive: valueEncodings | Encoding.Primitive,
-      constructed: valueEncodings | Encoding.Constructed,
-    },
-    value: tagNumber,
-  };
-}
-
-const Universal = {
-  EOC:                        generateTagClassType('endOfContent', Encoding.Primitive, 0), // End-of-Content
-  BOOLEAN:                    generateTagClassType('boolean', Encoding.Primitive, 1),
-  INTEGER:                    generateTagClassType('integer', Encoding.Primitive, 2),
-  BIT_STRING:                 generateTagClassType('bitString', Encoding.Primitive & Encoding.Constructed, 3),
-  OCTET_STRING:               generateTagClassType('octetString', Encoding.Primitive & Encoding.Constructed, 4),
-  NULL:                       generateTagClassType('null', Encoding.Primitive, 5),
-  OBJECT_IDENTIFIER:          generateTagClassType('oid', Encoding.Primitive, 6),
-  Object_Descriptor:          generateTagClassType('odesc', Encoding.Primitive & Encoding.Constructed, 7),
-  EXTERNAL:                   generateTagClassType('external', Encoding.Constructed, 8),
-  REAL:                       generateTagClassType('float', Encoding.Primitive, 9), // float
-  ENUMERATED:                 generateTagClassType('enumerated', Encoding.Primitive, 10),
-  EMBEDDED_PDV:               generateTagClassType('embeddedPDV', Encoding.Constructed, 11),
-  UTF8String:                 generateTagClassType('utf8String', Encoding.Primitive & Encoding.Constructed, 12),
-  RELATIVE_OID:               generateTagClassType('roid', Encoding.Primitive, 13),
-  RESERVED_01:                generateTagClassType('reserved', null, 14),
-  RESERVED_02:                generateTagClassType('reserved', null, 15),
-  SEQUENCE:                   generateTagClassType('sequence', Encoding.Constructed, 16),
-  SET:                        generateTagClassType('set', Encoding.Constructed, 17),
-  NumericString:              generateTagClassType('numericString', Encoding.Primitive & Encoding.Constructed, 18),
-  PrintableString:            generateTagClassType('printableString', Encoding.Primitive & Encoding.Constructed, 19),
-  T61String:                  generateTagClassType('t61String', Encoding.Primitive & Encoding.Constructed, 20),
-  VideoetxString:             generateTagClassType('videotexString', Encoding.Primitive & Encoding.Constructed, 21),
-  IA5String:                  generateTagClassType('ia5String', Encoding.Primitive & Encoding.Constructed, 22),
-  UTCTime:                    generateTagClassType('utcTime', Encoding.Primitive & Encoding.Constructed, 23),
-  GeneralizedTime:            generateTagClassType('generalizedTime', Encoding.Primitive & Encoding.Constructed, 24),
-  GraphicString:              generateTagClassType('graphicString', Encoding.Primitive & Encoding.Constructed, 25),
-  VisibleString:              generateTagClassType('visibleString', Encoding.Primitive & Encoding.Constructed, 26),
-  GeneralString:              generateTagClassType('generalString', Encoding.Primitive & Encoding.Constructed, 27),
-  UniversalString:            generateTagClassType('universalString', Encoding.Primitive & Encoding.Constructed, 28),
-  CHARACTER_STRING:           generateTagClassType('characterString', Encoding.Primitive & Encoding.Constructed, 29),
-  BMPString:                  generateTagClassType('bmpString', Encoding.Primitive & Encoding.Constructed, 30),
+const TagClassFactory = (type, defaultValue) => class {
+  constructor(value, content, encoding, { validEncodings = [Constructed] } = {}) {
+    const NewType = class extends TypeClassFactory(this.constructor, null, validEncodings) { };
+    return new NewType(content, { encoding, value });
+  }
+  static get type() { return type; }
+  static get value() { return defaultValue; }
 };
 
-function generateTagClass(name, value, types) {
-  return {
-    name,
-    value,
-    types,
-  };
+class Universal extends TagClassFactory('universal', 0x00) { }
+class Application extends TagClassFactory('application', 0x40) { }
+class ContextSpecific extends TagClassFactory('contextSpecific', 0x80) { }
+class Private extends TagClassFactory('private', 0xC0) { }
+
+function importInteger(content) {
+  const contentType = typeof content;
+  if (contentType === 'number') return content;
+  if (contentType === 'string') return BigInteger.fromString(content);
+  if (contentType === 'object' && content instanceof BigInteger) return content;
+  throw new InvalidASN1ContentError(`cannot import an integer from "${contentType}"`);
 }
 
-export const TagClass = {
-  Universal:                  generateTagClass('universal', 0x00, Universal),
-  Application:                generateTagClass('application', 0x40),
-  ContextSpecific:            generateTagClass('context specific', 0x80),
-  Private:                    generateTagClass('private', 0xC0),
-};
+Universal.EOC = class EOC extends TypeClassFactory(Universal, 'endOfContent', [Primitive], 0) { };
+Universal.Bool = class Bool extends TypeClassFactory(Universal, 'boolean', [Primitive], 1) { };
+Universal.Integer = class Integer extends TypeClassFactory(Universal, 'integer', [Primitive], 2, null, importInteger) { };
+Universal.BitString = class BitString extends TypeClassFactory(Universal, 'bitString', [Primitive, Constructed], 3) { };
+Universal.OctetString = class OctetString extends TypeClassFactory(Universal, 'octetString', [Primitive, Constructed], 4) { };
+Universal.Null = class Null extends TypeClassFactory(Universal, 'null', [Primitive], 5) { };
+Universal.OID = class OID extends TypeClassFactory(Universal, 'oid', [Primitive], 6) { };
+Universal.ODesc = class ODesc extends TypeClassFactory(Universal, 'odesc', [Primitive, Constructed], 7) { };
+Universal.External = class External extends TypeClassFactory(Universal, 'external', [Constructed], 8) { };
+Universal.Real = class Real extends TypeClassFactory(Universal, 'float', [Primitive], 9) { };
+Universal.Enumerated = class Enumerated extends TypeClassFactory(Universal, 'enumerated', [Primitive], 10) { };
+Universal.EnumeratedPDV = class EnumeratedPDV extends TypeClassFactory(Universal, 'embeddedPDV', [Constructed], 11) { };
+Universal.UTF8String = class UTF8String extends TypeClassFactory(Universal, 'utf8String', [Primitive, Constructed], 12) { };
+Universal.ROID = class ROID extends TypeClassFactory(Universal, 'roid', [Primitive], 13) { };
+Universal.Sequence = class Sequence extends TypeClassFactory(Universal, 'sequence', [Constructed], 16, []) { };
+Universal.Set = class Set extends TypeClassFactory(Universal, 'set', [Constructed], 17, []) { };
+Universal.NumericString = class NumericString extends TypeClassFactory(Universal, 'numericString', [Primitive, Constructed], 18) { };
+Universal.PrintableString = class PrintableString extends TypeClassFactory(Universal, 'printableString', [Primitive, Constructed], 19) { };
+Universal.T61String = class T61String extends TypeClassFactory(Universal, 't61String', [Primitive, Constructed], 20) { };
+Universal.VideoetxString = class VideoetxString extends TypeClassFactory(Universal, 'videotexString', [Primitive, Constructed], 21) { };
+Universal.IA5String = class IA5String extends TypeClassFactory(Universal, 'ia5String', [Primitive, Constructed], 22) { };
+Universal.UTCTime = class UTCTime extends TypeClassFactory(Universal, 'utcTime', [Primitive, Constructed], 23) { };
+Universal.GeneralizedTime = class GeneralizedTime extends TypeClassFactory(Universal, 'generalizedTime', [Primitive, Constructed], 24) { };
+Universal.GraphicString = class GraphicString extends TypeClassFactory(Universal, 'graphicString', [Primitive, Constructed], 25) { };
+Universal.VisibleString = class VisibleString extends TypeClassFactory(Universal, 'visibleString', [Primitive, Constructed], 26) { };
+Universal.GeneralString = class GeneralString extends TypeClassFactory(Universal, 'generalString', [Primitive, Constructed], 27) { };
+Universal.UniversalString = class UniversalString extends TypeClassFactory(Universal, 'universalString', [Primitive, Constructed], 28) { };
+Universal.CharString = class CharString extends TypeClassFactory(Universal, 'characterString', [Primitive, Constructed], 29) { };
+Universal.BMPString = class BMPString extends TypeClassFactory(Universal, 'bmpString', [Primitive, Constructed], 30) { };
 
-export function findTagClassByName(tagClassName) {
-  const tagClassSearchResult = pickBy(TagClass, tagClass => tagClass.name === tagClassName);
-  const tagClassSearchResultKeys = Object.keys(tagClassSearchResult);
-  if (tagClassSearchResultKeys.length < 1) throw new Errors.UnknownTagClass(`unknown tag class "${tagClassName}"`);
-  const tagClass = tagClassSearchResult[Object.keys(tagClassSearchResult)[0]];
-  return tagClass;
+const types = Object.keys(Universal).map(key => Universal[key].constructor ? Universal[key] : null).filter(Boolean);
+
+export { Universal, Application, ContextSpecific, Private };
+
+export function findTagClass(value) {
+  return [Universal, Application, ContextSpecific, Private].find(tagClass => tagClass.type === value);
 }
 
-export function findEncodingByName(encodingName) {
-  const encodingSearchResult = pickBy(Encoding, encoding => encoding.name === encodingName);
-  const encodingSearchResultKeys = Object.keys(encodingSearchResult);
-  if (encodingSearchResultKeys.length < 1) throw new Errors.UnknownEncoding(`unknown encoding "${encodingName}"`);
-  const encoding = encodingSearchResult[Object.keys(encodingSearchResult)[0]];
-  return encoding;
-}
-
-export function findTypeByName(tagClass, typeName) {
-  const typeSearchResult = pickBy(tagClass.types, type => type.name === typeName);
-  const typeSearchResultKeys = Object.keys(typeSearchResult);
-  if (typeSearchResultKeys.length < 1) throw new Errors.UnknownEncoding(`unknown type "${typeName}"`);
-  const type = typeSearchResult[Object.keys(typeSearchResult)[0]];
-  return type;
+export function findType(value) {
+  return types.find(T => (new T()).type === value);
 }
