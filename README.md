@@ -1,6 +1,8 @@
 # @complyify/asn1
 
-Javascript object serializer and deserializer for Abstract Syntax Notation One (ASN.1).
+Javascript library for Abstract Syntax Notation One (ASN.1).
+
+Provides a programmatic interface for building an ASN.1 object model along with JSON serialization / deserialization.
 
 ## Installation
 
@@ -8,6 +10,28 @@ Javascript object serializer and deserializer for Abstract Syntax Notation One (
 
 ## Usage
 
+```javascript
+import { JSONDeserializer, JSONSerializer, Universal } from '@complyify/asn1';
+
+// Create an ASN.1 object model programmatically
+const { Bool, Integer, Null, PrintableString, Sequence } = Universal;
+const sequence = new Sequence([
+  new Integer(-Number.MAX_SAFE_INTEGER),
+  new Integer(Number.MAX_SAFE_INTEGER),
+  new Integer('424242424242424242424242424242424242'), // big integer
+  new Null(),
+  new Bool(true),
+  new PrintableString('nice marmot'),
+]);
+
+// Serialize the object model to JSON
+const serialize = new JSONSerializer();
+const json = serialize(sequence);
+
+// Deserialize back to an ASN.1 object model
+const deserialize = new JSONDeserializer();
+const asn1ObjectModel = deserialize(json);
+```
 
 ## Debugging
 

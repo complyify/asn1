@@ -1,0 +1,13 @@
+{
+  "tagClass": "universal",
+  "encoding": "constructed",
+  "type": "sequence",
+  "content": [
+    {
+      "tagClass": "universal",
+      "encoding": "primitive",
+      "type": "integer",
+      "content": 9007199254740991
+    }
+  ]
+}

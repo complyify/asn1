@@ -1,0 +1,115 @@
+{
+  "tagClass": "universal",
+  "encoding": "constructed",
+  "type": "sequence",
+  "content": [
+    {
+      "tagClass": "universal",
+      "encoding": "constructed",
+      "type": "sequence",
+      "content": [
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "integer",
+          "content": -9007199254740991
+        },
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "integer",
+          "content": 9007199254740991
+        },
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "null"
+        },
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "boolean",
+          "content": true
+        },
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "printableString",
+          "content": "nice marmot"
+        }
+      ]
+    },
+    {
+      "tagClass": "universal",
+      "encoding": "constructed",
+      "type": "sequence",
+      "content": [
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "integer",
+          "content": -9007199254740991
+        },
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "integer",
+          "content": 9007199254740991
+        },
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "null"
+        },
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "boolean",
+          "content": true
+        },
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "printableString",
+          "content": "nice marmot"
+        }
+      ]
+    },
+    {
+      "tagClass": "universal",
+      "encoding": "constructed",
+      "type": "sequence",
+      "content": [
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "integer",
+          "content": -9007199254740991
+        },
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "integer",
+          "content": 9007199254740991
+        },
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "null"
+        },
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "boolean",
+          "content": true
+        },
+        {
+          "tagClass": "universal",
+          "encoding": "primitive",
+          "type": "printableString",
+          "content": "nice marmot"
+        }
+      ]
+    }
+  ]
+}

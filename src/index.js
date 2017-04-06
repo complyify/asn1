@@ -1,17 +1,10 @@
 import ASN1 from './asn1';
-import * as errors from './errors';
-import * as patterns from './patterns';
-import * as Types from './types';
 
 export default ASN1;
+export * from './encodings';
+export * from './errors';
+export * from './types';
 export * from './deserializer';
+export * from './deserializer-json';
 export * from './serializer';
-
-export * from './der';
-export * from './pem';
-
-export {
-  errors,
-  patterns,
-  Types,
-};
+export * from './serializer-json';

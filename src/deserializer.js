@@ -1,7 +1,11 @@
 export class Deserializer {
 
-  constructor(encoding) {
-    this.encoding = encoding;
+  constructor() {
+    return this.deserialize.bind(this);
+  }
+
+  deserialize(object) {
+    return this.deserializationImpl(object);
   }
 
 }
