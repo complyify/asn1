@@ -13,9 +13,9 @@ export class Serializer {
     return this.serialize.bind(this);
   }
 
-  serialize(aom) {
+  serialize(aom, params) {
     validateAOM(aom);
-    return this.serializationImpl(aom);
+    return this.serializationImpl(aom, params);
   }
 
 }
