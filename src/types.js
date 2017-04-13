@@ -6,7 +6,7 @@ import { Constructed, InvalidASN1ContentError, Primitive } from './encodings';
 export class Type { }
 
 const TypeClassFactory = (tagClass, type, validEncodings, defaultValue, defaultContent, contentProcessor) => class extends Type {
-  constructor(content, { encoding = validEncodings[0], value } = {}) {
+  constructor(content, { encoding = validEncodings[0], value = null } = {}) {
     super();
     this.encoding = encoding;
     if (value != null) this._value = value;
@@ -35,7 +35,11 @@ class Private extends TagClassFactory('private', 0xC0) { }
 function importInteger(content) {
   const contentType = typeof content;
   if (contentType === 'number') return content;
-  if (contentType === 'string') return BigInteger.fromString(content);
+  if (contentType === 'string') { // big integer import
+    const radix = content.startsWith('0x') ? 16 : 10;
+    const intStr = radix === 16 ? content.slice(2) : content;
+    return BigInteger.fromString(intStr, radix);
+  }
   if (contentType === 'object' && content instanceof BigInteger) return content;
   throw new InvalidASN1ContentError(`cannot import an integer from "${contentType}"`);
 }
