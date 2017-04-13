@@ -2,6 +2,7 @@
 import BigInteger from 'node-biginteger';
 
 import { Constructed, InvalidASN1ContentError, Primitive } from './encodings';
+import { InvalidASN1ObjectModelError } from './errors';
 
 export class Type { }
 
@@ -78,8 +79,15 @@ const types = Object.keys(Universal).map(key => Universal[key].constructor ? Uni
 
 export { Universal, Application, ContextSpecific, Private };
 
+const TagClasses = [Universal, Application, ContextSpecific, Private];
+
 export function findTagClass(value) {
-  return [Universal, Application, ContextSpecific, Private].find(tagClass => tagClass.type === value);
+  const valueType = typeof value;
+  switch (valueType) {
+    case 'string': return TagClasses.find(tagClass => tagClass.type === value);
+    case 'number': return TagClasses.find(tagClass => tagClass.value === value);
+    default: throw new InvalidASN1ObjectModelError(`Must use string or number to lookup tag class, not "${valueType}"`);
+  }
 }
 
 export function findType(value) {
