@@ -28,7 +28,7 @@
     "pre-commit": "^1.2.2"
   },
   "dependencies": {
-    "@complyify/debug": "^1.0.1",
+    "@complyify/debug": "^1.0.5",
     "node-biginteger": "^0.0.10"
   },
   "pre-commit": [
