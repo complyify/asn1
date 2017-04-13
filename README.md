@@ -33,6 +33,16 @@ const deserialize = new JSONDeserializer();
 const asn1ObjectModel = deserialize(json);
 ```
 
+## Encoders
+
+There are a multitude of encoding rules available for ASN.1. Known encoders are shown below.
+
+| Format | Implementation | Serialization | Deserialization | Comments |
+| --- | --- | --- | --- | --- |
+| JSON | Included w/ this library | Yes | Yes | A library specific JSON format as no JSON encoding rules exist as part of the ASN.1 standards |
+| DER | [@complyify/asn1-der] | Yes | Planned | Distinguished Encoding Rules (DER) are the standard ASN.1 encoding rules for public key cryptography (certificates, RSA keys, et al.) |
+| PEM | [@complyify/asn1-der] | Yes | Planned | Privacy Enhanced Mail (PEM) is a base64-encoded and specially formatted version of DER commonly used to distribute X.509 certificates |
+
 ## Debugging
 
 This library uses the [@complyify/debug] library for debugging. To enable debug messages, simply set the `DEBUG`
@@ -45,4 +55,5 @@ DEBUG=complyify:asn1:* <your-exec-here>
 DEBUG=complyify:asn1:*,-complyify:asn1:*:binary <your-exec-here>
 ```
 
+[@complyify/asn1-der]: https://github.com/complyify/asn1-der
 [@complyify/debug]: https://github.com/complyify/debug
