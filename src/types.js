@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
 import BigInteger from 'node-biginteger';
 
-import { Constructed, InvalidASN1ContentError, Primitive } from './encodings';
-import { InvalidASN1ObjectModelError } from './errors';
+import { Constructed, Primitive } from './encodings';
+import { InvalidASN1ContentError, InvalidASN1ObjectModelError } from './errors';
 
 export class Type { }
 
@@ -41,7 +41,10 @@ function importInteger(content) {
     const intStr = radix === 16 ? content.slice(2) : content;
     return BigInteger.fromString(intStr, radix);
   }
-  if (contentType === 'object' && content instanceof BigInteger) return content;
+  if (contentType === 'object') {
+    if (content.constructor.name === 'BigInteger') return content;
+    throw new InvalidASN1ContentError('integer objects must be instance of BigInteger');
+  }
   throw new InvalidASN1ContentError(`cannot import an integer from "${contentType}"`);
 }
 
@@ -75,7 +78,7 @@ Universal.UniversalString = class UniversalString extends TypeClassFactory(Unive
 Universal.CharString = class CharString extends TypeClassFactory(Universal, 'characterString', [Primitive, Constructed], 29) { };
 Universal.BMPString = class BMPString extends TypeClassFactory(Universal, 'bmpString', [Primitive, Constructed], 30) { };
 
-const types = Object.keys(Universal).map(key => Universal[key].constructor ? Universal[key] : null).filter(Boolean);
+const Types = Object.keys(Universal).map(key => Universal[key].constructor ? Universal[key] : null).filter(Boolean);
 
 export { Universal, Application, ContextSpecific, Private };
 
@@ -91,5 +94,10 @@ export function findTagClass(value) {
 }
 
 export function findType(value) {
-  return types.find(T => (new T()).type === value);
+  const valueType = typeof value;
+  switch (valueType) {
+    case 'string': return Types.find(AType => (new AType()).type === value);
+    case 'number': return Types.find(AType => (new AType()).value === value);
+    default: throw new InvalidASN1ObjectModelError(`Must use string or number to lookup type, not "${valueType}"`);
+  }
 }
