@@ -21,13 +21,15 @@ function validateJSON(json, root = true) {
 }
 
 export class JSONDeserializer extends Deserializer {
-
   deserializationImpl(json, root = true) {
     validateJSON(json, root);
-
     if (Array.isArray(json)) return json.map(item => this.deserializationImpl(item, false));
-
-    const { tagClass: tagClassValue, encoding: encodingValue, type: typeValue, content: contentValue } = json;
+    const {
+      tagClass: tagClassValue,
+      encoding: encodingValue,
+      type: typeValue,
+      content: contentValue,
+    } = json;
     const tagClass = findTagClass(tagClassValue);
     const encoding = findEncoding(encodingValue);
     const content = encoding.type === Primitive.type ? contentValue : this.deserializationImpl(contentValue, false);
@@ -37,5 +39,4 @@ export class JSONDeserializer extends Deserializer {
     }
     return new tagClass(typeValue, content, encoding); // eslint-disable-line new-cap
   }
-
 }

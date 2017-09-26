@@ -1,10 +1,8 @@
 import { InvalidASN1ObjectModelError } from '.';
 
 const Encoding = (type, value) => class {
-
   static get type() { return type; }
   static get value() { return value; }
-
 };
 
 export class Primitive extends Encoding('primitive', 0x00) { }

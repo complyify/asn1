@@ -17,11 +17,15 @@ function jsonify(content) {
 }
 
 export class JSONSerializer extends Serializer {
-
   serializationImpl(aom) {
     if (Array.isArray(aom)) return aom.map(item => this.serializationImpl(item));
 
-    const { tagClass, type, encoding, content } = aom;
+    const {
+      tagClass,
+      type,
+      encoding,
+      content,
+    } = aom;
     const { type: tagClassName } = tagClass;
     const { type: encodingName } = encoding;
 
@@ -37,5 +41,4 @@ export class JSONSerializer extends Serializer {
 
     return serialized;
   }
-
 }
