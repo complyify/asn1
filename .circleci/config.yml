@@ -17,3 +17,12 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: yarn run check
+      - deploy:
+          name: NPM Package Deploy
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              echo -e "$NPM_USERNAME\n$NPM_PASSWORD\n$NPM_EMAIL" | npm login
+              npm publish --access public
+            else
+              echo "will not deploy from branch \"$CIRCLE_BRANCH\""
+            fi
