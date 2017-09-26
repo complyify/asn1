@@ -21,6 +21,7 @@ jobs:
           name: NPM Package Deploy
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              yarn compile
               echo -e "$NPM_USERNAME\n$NPM_PASSWORD\n$NPM_EMAIL" | npm login
               npm publish --access public
             else
