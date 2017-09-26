@@ -13,6 +13,7 @@
     "compile:watch": "WATCH=true yarn compile",
     "lint": "eslint src test",
     "test": "mocha ${WATCH:+--watch} ${DEBUGGER:+--inspect --debug-brk} --recursive --compilers js:babel-register",
+    "test:circleci": "script -q /dev/null circleci config validate -c .circleci/config.yml",
     "test:watch": "WATCH=true yarn test"
   },
   "devDependencies": {
@@ -32,6 +33,7 @@
     "node-biginteger": "^0.0.10"
   },
   "pre-commit": [
-    "check"
+    "check",
+    "test:circleci"
   ]
 }
