@@ -8,7 +8,6 @@ function validateAOM(aom) {
 }
 
 export class Serializer {
-
   constructor() {
     return this.serialize.bind(this);
   }
@@ -17,5 +16,4 @@ export class Serializer {
     validateAOM(aom);
     return this.serializationImpl(aom, params);
   }
-
 }

@@ -1,5 +1,4 @@
 export class Deserializer {
-
   constructor() {
     return this.deserialize.bind(this);
   }
@@ -7,5 +6,4 @@ export class Deserializer {
   deserialize(object) {
     return this.deserializationImpl(object);
   }
-
 }

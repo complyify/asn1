@@ -1,6 +1,12 @@
 import { Universal } from '../../../src/types';
 
-const { Bool, Integer, Null, PrintableString, Sequence } = Universal;
+const {
+  Bool,
+  Integer,
+  Null,
+  PrintableString,
+  Sequence,
+} = Universal;
 
 const sequence = new Sequence([
   new Integer(-Number.MAX_SAFE_INTEGER),
