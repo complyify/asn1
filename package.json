@@ -1,6 +1,6 @@
 {
   "name": "@complycloud/asn1",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Javascript library for parsing Abstract Syntax Notation One (ASN.1)",
   "main": "dist/index.js",
   "repository": "git@github.com:complycloud/asn1.git",
